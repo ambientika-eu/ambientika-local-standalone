@@ -1,0 +1,144 @@
+# Konfiguration des lokalen Ambientika-Servers.
+# Kopie als konfiguration.yaml anlegen und anpassen.
+
+datenbank: ambientika.db
+geheimnis_datei: jwt-geheimnis.txt
+
+rest:
+  # Auf die LAN-Adresse binden, nicht auf 0.0.0.0, sobald der Server dauerhaft
+  # läuft. Port 4521 ist der, den die App erwartet.
+  host: 0.0.0.0
+  port: 4521
+
+geraete:
+  # Hierher verbinden sich die Lüfter. Port 11000 ist fest — er steht in der
+  # Firmware der Geräte und lässt sich nur über die Provisionierung ändern.
+  host: 0.0.0.0
+  port: 11000
+
+# Nur diese Seriennummern werden bedient. Leer lassen heißt: jede annehmen.
+# Das Geräteprotokoll kennt keine Anmeldung, deshalb ist diese Liste im
+# Dauerbetrieb die einzige Zugangskontrolle auf der Geräteseite.
+erlaubte_serien:
+  # - 1C9DC2430444
+  # - AABBCCDDEEFF
+
+# ---------------------------------------------------------------------------
+# Beobachtungsmodus — AUSLIEFERUNGSZUSTAND
+# ---------------------------------------------------------------------------
+# true:  Der Server liest, zeigt an und protokolliert, sendet aber nichts an
+#        die Geräte. Ihre Anlage läuft weiter wie bisher.
+# false: Der Server steuert.
+#
+# Ausgeliefert wird mit true, und zwar aus einem konkreten Grund: Diese Fassung
+# ist noch nicht an echten Geräten geprüft. Die Belegung der Statusfelder
+# älterer Firmware ist aus einem einzigen gemeldeten Rahmen hergeleitet — in
+# sich stimmig, aber unbestätigt.
+#
+# Lassen Sie den Server ein bis zwei Tage mitlaufen und vergleichen Sie die
+# angezeigten Werte mit dem Display Ihres Geräts. Stimmen Temperatur, Feuchte,
+# Modus und Stufe überein, ist die Belegung für Ihre Firmware bestätigt — dann
+# hier auf false stellen.
+#
+# Weichen sie ab: bitte melden. Das ist genau die Rückmeldung, die noch fehlt.
+nur_beobachten: true
+
+# Befehle unterdrücken, die den bereits aktiven Zustand wiederholen.
+# Jeder angenommene Befehl löst am Gerät den Quittungston aus; nachts im
+# Schlafzimmer ist das der Unterschied zwischen still und wach.
+noop_unterdruecken: true
+
+# Messwertkorrektur je Gerät, aus einer eigenen Vergleichsmessung.
+# Der Fühler sitzt im Luftweg des Geräts und misst die Luft, die das Gerät
+# bewegt. Wer auf die Raummitte regeln will, trägt hier den Versatz ein.
+kalibrierung:
+  # "1C9DC2430444":
+  #   temp: -3.05
+  #   rh: 12.5
+
+# ---------------------------------------------------------------------------
+# Außenluft für den SMART-Modus
+# ---------------------------------------------------------------------------
+# Die Quellen werden in fester Reihenfolge versucht: erst der eigene Sensor,
+# dann OpenWeatherMap, zuletzt der feste Wert. Die erste, die antwortet, gewinnt.
+#
+# Empfehlung: der eigene Sensor. Er misst die Luft, die das Haus tatsächlich
+# ansaugt, und hält den Betrieb vollständig offline. Eine Wetterstation zehn
+# Kilometer entfernt weiß nichts über die Nordwand.
+
+sensor:
+  # typ: homeassistant | esphome | mqtt | json  — genau einer.
+
+  # --- Home Assistant -------------------------------------------------------
+  # typ: homeassistant
+  # url: "http://homeassistant.local:8123"
+  # token: "langlebiges Zugriffstoken aus Profil -> Sicherheit"
+  # entitaet_temperatur: sensor.aussen_temperatur
+  # entitaet_feuchte: sensor.aussen_luftfeuchtigkeit
+
+  # --- ESPHome, direkt ohne Home Assistant ----------------------------------
+  # typ: esphome
+  # url: "http://aussensensor.local"
+  # sensor_temperatur: aussentemperatur
+  # sensor_feuchte: aussenfeuchte
+
+  # --- MQTT, wo die meisten Funksensoren landen -----------------------------
+  # typ: mqtt
+  # broker: 192.168.1.10
+  # port: 1883
+  # benutzer: mqttuser
+  # passwort: geheim
+  # Zwei getrennte Themen mit nackten Zahlen:
+  # thema_temperatur: "aussen/temperatur"
+  # thema_feuchte: "aussen/feuchte"
+  # Oder ein Zigbee2MQTT-Objekt, aus dem zwei Felder gelesen werden:
+  # thema_temperatur: "zigbee2mqtt/Aussensensor"
+  # thema_feuchte: "zigbee2mqtt/Aussensensor"
+  # feld_temperatur: temperature
+  # feld_feuchte: humidity
+  # Nach dieser Zeit gilt ein Wert als tot — eine leere Batterie soll die
+  # Regelung nicht wochenlang auf den letzten Messwert festnageln.
+  # max_alter_minuten: 30
+
+  # --- Beliebiges JSON über HTTP --------------------------------------------
+  # typ: json
+  # url: "http://192.168.1.50/api/aussen"
+  # Verschachtelte Felder mit Punkt: "daten.aussen.temperatur"
+  # pfad_temperatur: temperature
+  # pfad_feuchte: humidity
+
+wetter:
+  # Rückfallebene: dieselbe Quelle, die auch die Cloud nutzt. Braucht Internet
+  # und einen EIGENEN Schlüssel — niemals den aus der App übernehmen, der ist
+  # im APK für jeden auslesbar.
+  # openweathermap_schluessel: "hier-eigenen-schluessel-eintragen"
+
+  # Letzte Rückfallebene, nur für Inbetriebnahme und Prüfstand. Zum Regeln
+  # taugt ein erfundener Außenwert nicht.
+  fester_wert:
+    temperatur: 10.0
+    feuchte: 70.0
+
+# ---------------------------------------------------------------------------
+# Wetterkanal zum Gerät
+# ---------------------------------------------------------------------------
+# Das Gerät fragt die Außenwerte über die Geräteverbindung an. Das Paketformat
+# ist noch nicht bestätigt — bis dahin bleibt dieser Abschnitt leer, und
+# Anfragen werden nur protokolliert. Ein geratenes Antwortpaket würde das Gerät
+# auf erfundene Werte regeln lassen. Siehe MITSCHNITT.md.
+wetterkanal: {}
+  # Sobald der Mitschnitt ausgewertet ist:
+  # anfragetyp: 0x05
+  # vorlage: "05001c9dc24304440a2d0000"   # ein echtes Antwortpaket
+  # offset_temperatur: 8
+  # offset_feuchte: 9
+
+# Steuert, was die App anzeigt. Ohne weeklyScheduler blendet sie den
+# Wochenzeitplan aus, ohne dass ein Fehler erscheint.
+feature_flags:
+  rememberMeLogin: true
+  resetDeviceEndpoint: true
+  weeklyScheduler: true
+  improvedRoomList: true
+  # Turbo nur einschalten, wenn die Geräte es können.
+  turboMode: false

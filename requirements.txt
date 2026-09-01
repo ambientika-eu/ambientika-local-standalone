@@ -1,0 +1,12 @@
+# Laufzeit
+fastapi>=0.110
+pydantic>=2.6
+uvicorn>=0.27
+PyJWT>=2.8
+PyYAML>=6.0
+
+# Nur für den MQTT-Außensensor
+paho-mqtt>=1.6
+
+# Nur zum Ausführen der Tests
+# httpx>=0.27

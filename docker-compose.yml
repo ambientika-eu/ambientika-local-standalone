@@ -1,0 +1,20 @@
+services:
+  ambientika-local:
+    build: .
+    container_name: ambientika-local
+    restart: unless-stopped
+
+    # network_mode: host ist kein Komfort, sondern nötig: Die Geräte finden
+    # sich untereinander per UDP-Broadcast im selben Subnetz. Hinter einer
+    # Container-Bridge sehen sie sich nicht.
+    network_mode: host
+
+    volumes:
+      - ./daten:/daten
+
+    environment:
+      - PYTHONUNBUFFERED=1
+
+    # Ohne eigene Konfiguration startet der Server mit Beobachtungsmodus —
+    # er liest und zeigt an, schaltet aber nichts.
+    command: ["--konfig", "/daten/konfiguration.yaml"]
