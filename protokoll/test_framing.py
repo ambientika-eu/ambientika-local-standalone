@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stream-framing tests — the part that actually failed in upstream issue #5.
+Stream-framing tests — the case that failed against legacy firmware (field report #5).
 
 The old handler sliced a fixed 21 bytes off every ``0x01`` frame. Against a
 legacy unit sending 19 that walks two bytes further into the stream on each

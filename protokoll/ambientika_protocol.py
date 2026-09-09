@@ -11,7 +11,7 @@ What changed versus the inline codec in the bridge
 --------------------------------------------------
 1. **Variable-length status frames.** The old demux read a fixed 21 bytes for
    every ``0x01`` frame. Units with radio firmware 0.0.11 emit **19** bytes
-   (upstream issue #5): the layout is identical on offsets 0..18 and simply
+   (field report #5): the layout is identical on offsets 0..18 and simply
    omits the two fields that were added later — light sensor and RSSI. The
    length is now resolved per device, primarily from the firmware frame and
    only as a fallback by inspecting the stream.
@@ -252,7 +252,8 @@ def dew_point(temp_c, rh_pct) -> Optional[float]:
 #: Ranges a genuine reading must fall into. These are deliberately generous —
 #: the point is not to validate the sensor but to catch a *mis-parsed frame*,
 #: where the bytes land in the wrong fields and produce something physically
-#: impossible. A reverse-engineered layout that drifts shows up here first.
+#: impossible. A layout that drifts against a firmware revision shows up here
+#: first.
 PLAUSIBLE_TEMP_C = (-40, 60)
 PLAUSIBLE_RH_PCT = (0, 100)
 PLAUSIBLE_RSSI_DBM = (-100, -10)

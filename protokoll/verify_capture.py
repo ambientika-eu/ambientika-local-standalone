@@ -8,9 +8,9 @@ every frame and prints it next to the raw bytes — and it never writes a single
 byte back. No commands, no setup frames, no mode changes. The unit keeps running
 exactly as it did before; it simply has a listener instead of a controller.
 
-That property is the whole point: it makes it safe to validate a
-reverse-engineered layout on a real installation. If a field is mapped wrong you
-see a wrong number on screen and nothing has happened to the ventilation.
+That property is the whole point: it makes it safe to validate the frame layout
+on a live installation. If a field is mapped wrong you see a wrong number on
+screen and nothing has happened to the ventilation.
 
 Usage
 -----

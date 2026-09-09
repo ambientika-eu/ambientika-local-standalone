@@ -1,7 +1,13 @@
-# Ambientika Local App — ohne Südwind-Server-Anbindung
+# Ambientika Local App — Betrieb ohne Server-Anbindung
 
-Zweite, eigenständige Fassung der Local App. Sie ersetzt die bestehende nicht,
-sie steht daneben. Kunden wählen.
+Eigenständige Fassung der Local App für den serverlosen Betrieb. Sie ersetzt die
+bestehende Fassung nicht, sondern steht als **Rückfallebene** daneben: Sie hält
+eine Anlage vollständig bedienbar, wenn der Südwind-Server nicht erreichbar ist —
+bei Wartungsfenstern, Netzstörungen oder in Objekten, für die eine dauerhafte
+Internetanbindung nicht vorgesehen ist.
+
+Für den Regelbetrieb bleibt die Fassung mit Server-Anbindung die empfohlene
+Variante.
 
 | | Local App (bestehend) | Local App ohne Server-Anbindung |
 |---|---|---|
@@ -10,8 +16,8 @@ sie steht daneben. Kunden wählen.
 | Internet im Betrieb | erforderlich | nur für Wetterdaten, optional |
 | Südwind-Konto | erforderlich | nach der Inbetriebnahme nicht mehr |
 | Erstinbetriebnahme | über die App | **über die App, mit Südwind-Server** |
-| Empfehlung | **Standard** | auf Kundenwunsch |
-| Reifegrad | im Feld bewährt | neu, Hardwareprüfung offen |
+| Rolle | **Standard für den Regelbetrieb** | Rückfallebene |
+| Reifegrad | im Feld bewährt | neu, Feldvalidierung läuft |
 
 **Das bestehende Repository wird nicht angefasst.** Kein gemeinsamer Code, kein
 gemeinsames Deployment, keine geteilte Konfiguration. Wer die bewährte Fassung
@@ -19,10 +25,11 @@ betreibt, merkt von diesem Projekt nichts.
 
 ## Für wen das gedacht ist
 
-Für Anwender, die ihre Anlage bewusst vollständig im eigenen Netz betreiben
-wollen und mit DNS, Docker oder Python umgehen können. Diese Fassung wird
-deshalb auf den Produktseiten nicht beworben — sie steht hier für den, der sie
-sucht.
+Für Objekte, in denen die Anlage auch ohne erreichbaren Server bedienbar bleiben
+muss, und für Anwender, die sie bewusst vollständig im eigenen Netz betreiben und
+mit DNS, Docker oder Python umgehen können. Der Betrieb setzt Eingriffe am
+Netzwerk und einen durchlaufenden Rechner voraus; diese Fassung wird deshalb auf
+den Produktseiten nicht beworben und steht hier für den, der sie braucht.
 
 Für alle anderen bleibt die Empfehlung die Ambientika-App oder die Local App
 mit Server-Anbindung: im Feld bewährt, keine Einrichtung am Netzwerk, kein
@@ -36,16 +43,16 @@ bekommt sie dort ohne diesen Aufwand.
    Slave-Rollen setzen.
 2. **Danach auf den lokalen Server umstellen.** Ab hier läuft alles im Haus.
 
-Das ist bewusst so gewählt und keine Notlösung. Die Erstinbetriebnahme ist der
-Schritt mit den meisten Fehlerquellen — WLAN, Rollen, Zonen, Querlüftung. Der
-bewährte Weg erledigt ihn zuverlässig, und der lokale Betrieb setzt auf einer
-Anlage auf, die nachweislich funktioniert.
+Diese Reihenfolge ist bewusst gewählt. Die Erstinbetriebnahme ist der Schritt mit
+den meisten Fehlerquellen — WLAN, Rollen, Zonen, Querlüftung. Der bewährte Weg
+erledigt ihn zuverlässig, und der lokale Betrieb setzt auf einer Anlage auf, die
+nachweislich funktioniert.
 
 Technisch dahinter: Das Anlernen läuft über `encryptedDeviceInfo`, einen
-verschlüsselten Datenblock, dessen Verfahren nicht offenliegt. Der lokale
-Server kann deshalb bestehende Geräte weiterbetreiben, aber keine neuen
-anlernen. Die betreffenden Endpunkte antworten mit einer klaren Meldung statt
-still etwas Falsches zu tun.
+herstellerseitig verschlüsselten Datenblock. Der lokale Server betreibt deshalb
+bestehende Geräte weiter, lernt aber keine neuen an. Die betreffenden Endpunkte
+antworten mit einer eindeutigen Meldung, statt still einen falschen Zustand zu
+erzeugen.
 
 **Die Aussage „100 % lokal" bleibt dabei richtig** — sie bezieht sich auf den
 Betrieb, und der ist es. Nach der Umstellung verlässt kein Kommando und kein
@@ -68,9 +75,9 @@ Drei Wege, das Ziel auf den lokalen Server zu legen:
   Server zeigen lassen. Kein Eingriff am Gerät, wirkt für alle Geräte zugleich.
 - **Ziel per Bluetooth neu schreiben.** Einzeln je Gerät, ohne Routerrechte.
 
-Die Verbindung ist unverschlüsseltes TCP ohne Zertifikatsprüfung. Genau deshalb
-funktioniert die Umlenkung — und genau deshalb gehört der Server ins eigene
-Netz und Port 11000 niemals ins Internet.
+Die Geräteverbindung ist unverschlüsseltes TCP. Der lokale Server gehört deshalb
+ausschließlich ins eigene Netz; Port 11000 darf nicht ins Internet veröffentlicht
+werden.
 
 ## Der SMART-Modus
 
@@ -84,8 +91,8 @@ Der lokale Server beantwortet dieselbe Anfrage. Zwei Quellen sind vorgesehen:
 - **Eigener Außensensor** im Heimnetz — Home Assistant, ESPHome, MQTT oder
   beliebiges JSON über HTTP. Damit ist der Betrieb vollständig offline und die
   Werte stammen von der Luft, die das Haus tatsächlich ansaugt.
-- **OpenWeatherMap**, wie es die Cloud tut. Braucht Internet und einen eigenen
-  API-Schlüssel — nie den aus der App, der ist im APK für jeden auslesbar.
+- **OpenWeatherMap**, wie es der Südwind-Server tut. Braucht Internet und einen
+  eigenen, auf den Betreiber ausgestellten API-Schlüssel.
 - **Fester Wert**, nur für Inbetriebnahme und Prüfstand.
 
 Der Sensor ist die bessere Wahl und steht deshalb in der Kette vorn: Eine
@@ -112,9 +119,10 @@ es jemandem auffällt — das wäre schlechter als keine Antwort.
   ADVANCED B+. Gegen alle 27 Beispielrahmen der Anleitung Juli 2026 verifiziert.
 - `protokoll/verify_capture.py` — reiner Mitlese-Server zur Prüfung an echter
   Hardware. Kann technisch nichts senden.
-- `protokoll/mitschnitt_proxy.py` — hört bei der echten Unterhaltung zwischen
-  Gerät und Südwind-Server mit, ohne ein Byte zu verändern. Damit lässt sich
-  das noch fehlende Wetterpaket bestimmen. Anleitung in `MITSCHNITT.md`.
+- `protokoll/mitschnitt_proxy.py` — Diagnosewerkzeug zur Verifikation am Bestand:
+  zeichnet den Datenverkehr zwischen Gerät und Südwind-Server unverändert auf.
+  Damit wird das noch offene Wetterpaket spezifiziert. Anleitung in
+  `MITSCHNITT.md`.
 
 **Serverseite — 133 Tests, lauffähig:**
 
@@ -131,26 +139,25 @@ es jemandem auffällt — das wäre schlechter als keine Antwort.
   sobald das Paketformat bestätigt ist. Bis dahin protokolliert er sie
 - `server/haupt.py` — Einstiegspunkt, startet beide Dienste
 
-**Als Referenz vorhanden:**
+**Referenz (intern, nicht Bestandteil dieses Repositories):**
 
-- `../ambientika-api/API-REFERENZ.md` — alle 48 Endpunkte der Cloud-API mit
-  Request- und Response-Schemata, 35 Datenmodelle, 15 Enums. Das ist der
-  Vertrag, den der lokale Server erfüllen muss, damit die App unverändert
-  gegen ihn läuft.
+- `API-REFERENZ.md` — alle 48 Endpunkte der Server-API mit Request- und
+  Response-Schemata, 35 Datenmodelle, 15 Enums. Das ist der Vertrag, den der
+  lokale Server erfüllen muss, damit die App unverändert gegen ihn läuft.
 
 **Noch zu bauen:**
 
 - Beantwortung des `OutsideWeatherRequest` — sobald das Paketformat aus
   einem Mitschnitt bekannt ist. Bis dahin läuft alles außer SMART.
 
-**Offen und nur an Hardware zu klären:**
+**Am Bestand zu bestätigen:**
 
-- Die Feldbelegung des 19-Byte-Statusrahmens älterer Firmware. Hergeleitet aus
-  einem einzigen gemeldeten Rahmen, in sich stimmig, aber unbestätigt.
-- Ab welcher Firmwareversion 21 statt 19 Byte gesendet werden.
-- Das genaue Format des `OutsideWeatherRequest`-Pakets.
-- Ob der Filter-Reset auf RS485 wirklich auf Bit 0 des zweiten Datenbytes
-  liegt — die Dokumentrevisionen widersprechen sich hier.
+- Feldbelegung des 19-Byte-Statusrahmens älterer Firmware — in sich stimmig,
+  Bestätigung an einem Gerät dieses Stands steht aus.
+- Firmwareversion, ab der 21 statt 19 Byte gesendet werden.
+- Format des `OutsideWeatherRequest`-Pakets.
+- Lage des Filter-Resets auf RS485 (Bit 0 des zweiten Datenbytes) — die
+  Dokumentrevisionen sind hier uneinheitlich.
 
 ## Zwei Protokolle, nicht eines
 

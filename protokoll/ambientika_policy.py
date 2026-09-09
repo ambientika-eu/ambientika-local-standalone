@@ -133,8 +133,8 @@ def serial_allowed(serial: str, allowlist: set) -> bool:
 def write_refusal(observe_only: bool, what: str = "command") -> Optional[str]:
     """Return a refusal reason when the bridge must not write to a unit.
 
-    Observation mode is the safe way to validate a reverse-engineered layout on
-    somebody else's installation: the bridge reads, decodes and publishes, but
+    Observation mode is the safe way to validate the frame layout on a live
+    installation: the bridge reads, decodes and publishes, but
     every path that would write to hardware is closed here — one gate, not a
     flag checked in five places. If the field mapping turns out to be wrong,
     the operator sees wrong numbers and reports them; the ventilation itself

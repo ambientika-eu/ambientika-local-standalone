@@ -2,10 +2,10 @@
 """
 Regression tests for the Ambientika wire codec and the write policies.
 
-The centrepiece is ``SAMPLE_LEGACY``: the real 19-byte status frame reported in
-upstream issue #5 by a unit running radio firmware 0.0.11. Every field assertion
-against it is a claim about the layout that a hardware test can confirm or
-refute — which is the point, since the layout is reverse-engineered.
+The centrepiece is ``SAMPLE_LEGACY``: a real 19-byte status frame from a unit
+running radio firmware 0.0.11. Every field assertion against it is an explicit
+claim about the layout, so a test against that firmware stand confirms or refutes
+it directly.
 
 Run with:  python -m unittest -v
 """
