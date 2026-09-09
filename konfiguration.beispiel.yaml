@@ -108,9 +108,8 @@ sensor:
   # pfad_feuchte: humidity
 
 wetter:
-  # Rückfallebene: dieselbe Quelle, die auch die Cloud nutzt. Braucht Internet
-  # und einen EIGENEN Schlüssel — niemals den aus der App übernehmen, der ist
-  # im APK für jeden auslesbar.
+  # Rückfallebene: dieselbe Quelle, die auch der Südwind-Server nutzt. Braucht
+  # Internet und einen eigenen, auf den Betreiber ausgestellten Schlüssel.
   # openweathermap_schluessel: "hier-eigenen-schluessel-eintragen"
 
   # Letzte Rückfallebene, nur für Inbetriebnahme und Prüfstand. Zum Regeln
