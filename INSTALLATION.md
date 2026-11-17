@@ -90,7 +90,7 @@ Stromlos-Schalten für zehn Sekunden beschleunigt es. Im Log erscheint dann:
 
 ```
 Gerät verbunden von 192.168.1.44:51233
-1C9DC2430444 meldet Firmware radio=0.0.11 micro=0.0.11
+D0E1F2A3B4C5 meldet Firmware radio=0.0.11 micro=0.0.11
 ```
 
 **Rückweg:** DNS-Eintrag entfernen, Geräte kurz stromlos. Danach sprechen sie

@@ -27,8 +27,8 @@ from ambientika_policy import (
 )
 
 # The exact payload from issue #5, radio firmware 0.0.11.
-#   01 00 | 1C 9D C2 43 04 44 | 03 01 01 1B 35 00 00 00 01 00 03
-SAMPLE_LEGACY = bytes.fromhex("01001c9dc243044403010 11b3500000001 0003".replace(" ", ""))
+#   01 00 | D0 E1 F2 A3 B4 C5 | 03 01 01 1B 35 00 00 00 01 00 03
+SAMPLE_LEGACY = bytes.fromhex("0100d0e1f2a3b4c503010 11b3500000001 0003".replace(" ", ""))
 
 # The same reading as a 21-byte frame: light sensor "OFF" (1) and RSSI -58 dBm.
 SAMPLE_MODERN = SAMPLE_LEGACY + bytes([0x01, 0xC6])
@@ -47,7 +47,7 @@ class TestLegacyFrameDecoding(unittest.TestCase):
         self.d = decode_status(SAMPLE_LEGACY)
 
     def test_serial(self):
-        self.assertEqual(self.d["serial"], "1C9DC2430444")
+        self.assertEqual(self.d["serial"], "D0E1F2A3B4C5")
 
     def test_readings_are_plausible(self):
         self.assertEqual(self.d["temperature"], 27)
@@ -195,9 +195,9 @@ class TestCalibration(unittest.TestCase):
         self.assertEqual(d["temperature"], 23.5)
 
     def test_parsing_from_json(self):
-        cals = parse_calibration('{"1c9dc2430444": {"temp": -3.2, "rh": 6}}')
-        self.assertIn("1C9DC2430444", cals)
-        self.assertEqual(cals["1C9DC2430444"].temp, -3.2)
+        cals = parse_calibration('{"d0e1f2a3b4c5": {"temp": -3.2, "rh": 6}}')
+        self.assertIn("D0E1F2A3B4C5", cals)
+        self.assertEqual(cals["D0E1F2A3B4C5"].temp, -3.2)
 
     def test_bad_json_does_not_raise(self):
         self.assertEqual(parse_calibration("{not json"), {})
@@ -209,11 +209,11 @@ class TestSetupGating(unittest.TestCase):
 
     def setUp(self):
         self.targets = parse_setup_devices(
-            '{"1C9DC2430444": {"role": 0, "zone": 2, "house": 7}}')
+            '{"D0E1F2A3B4C5": {"role": 0, "zone": 2, "house": 7}}')
 
     def test_disabled_by_default_means_nothing_is_written(self):
         action, target, _ = setup_decision(
-            "1C9DC2430444", enabled=False, targets=self.targets,
+            "D0E1F2A3B4C5", enabled=False, targets=self.targets,
             reported_role=0, already_sent=False)
         self.assertEqual(action, SETUP_SKIP_DISABLED)
         self.assertIsNone(target)
@@ -226,35 +226,35 @@ class TestSetupGating(unittest.TestCase):
 
     def test_a_slave_is_not_silently_promoted_to_master(self):
         action, _, reason = setup_decision(
-            "1C9DC2430444", enabled=True, targets=self.targets,
+            "D0E1F2A3B4C5", enabled=True, targets=self.targets,
             reported_role=2, already_sent=False)
         self.assertEqual(action, SETUP_SKIP_ROLE_CONFLICT)
         self.assertIn("refusing", reason)
 
     def test_an_explicit_role_change_is_allowed(self):
         action, target, _ = setup_decision(
-            "1C9DC2430444", enabled=True, targets=self.targets,
+            "D0E1F2A3B4C5", enabled=True, targets=self.targets,
             reported_role=2, already_sent=False, allow_role_change=True)
         self.assertEqual(action, SETUP_SEND)
         self.assertEqual(target.role, 0)
 
     def test_matching_role_is_sent_with_the_configured_zone_and_house(self):
         action, target, _ = setup_decision(
-            "1C9DC2430444", enabled=True, targets=self.targets,
+            "D0E1F2A3B4C5", enabled=True, targets=self.targets,
             reported_role=0, already_sent=False)
         self.assertEqual(action, SETUP_SEND)
         self.assertEqual((target.role, target.zone, target.house), (0, 2, 7))
 
     def test_serial_matching_is_case_insensitive(self):
         action, _, _ = setup_decision(
-            "1c9dc2430444", enabled=True, targets=self.targets,
+            "d0e1f2a3b4c5", enabled=True, targets=self.targets,
             reported_role=0, already_sent=False)
         self.assertEqual(action, SETUP_SEND)
 
     def test_encoded_setup_carries_the_configured_house_id(self):
-        frame = encode_setup("1C9DC2430444", role=0, zone=2, house_id=7)
+        frame = encode_setup("D0E1F2A3B4C5", role=0, zone=2, house_id=7)
         self.assertEqual(frame[:2], bytes([0x02, 0x00]))
-        self.assertEqual(frame[2:8].hex().upper(), "1C9DC2430444")
+        self.assertEqual(frame[2:8].hex().upper(), "D0E1F2A3B4C5")
         self.assertEqual(frame[9], 0)          # role
         self.assertEqual(frame[10], 2)         # zone
         self.assertEqual(int.from_bytes(frame[12:16], "little"), 7)
@@ -282,27 +282,27 @@ class TestNoOpSuppression(unittest.TestCase):
         self.assertFalse(command_is_noop({}, 3, 1, 1, 1))
 
     def test_command_encoding_is_unchanged(self):
-        frame = encode_mode_command("1C9DC2430444", 3, 1, 1, 1)
+        frame = encode_mode_command("D0E1F2A3B4C5", 3, 1, 1, 1)
         self.assertEqual(frame,
-                         bytes.fromhex("02001c9dc2430444010301 0101".replace(" ", "")))
+                         bytes.fromhex("0200d0e1f2a3b4c5010301 0101".replace(" ", "")))
 
 
 class TestSerialAllowlist(unittest.TestCase):
     def test_empty_allowlist_accepts_everything(self):
-        self.assertTrue(serial_allowed("1C9DC2430444", set()))
+        self.assertTrue(serial_allowed("D0E1F2A3B4C5", set()))
 
     def test_listed_serial_is_accepted(self):
-        allow = parse_serial_list("1c9dc2430444, AABBCCDDEEFF")
-        self.assertTrue(serial_allowed("1C9DC2430444", allow))
+        allow = parse_serial_list("d0e1f2a3b4c5, AABBCCDDEEFF")
+        self.assertTrue(serial_allowed("D0E1F2A3B4C5", allow))
 
     def test_unlisted_serial_is_rejected(self):
         allow = parse_serial_list("AABBCCDDEEFF")
-        self.assertFalse(serial_allowed("1C9DC2430444", allow))
+        self.assertFalse(serial_allowed("D0E1F2A3B4C5", allow))
 
 
 class TestFirmwareFrame(unittest.TestCase):
     def test_decode(self):
-        frame = bytes([0x03, 0x00]) + bytes.fromhex("1C9DC2430444") + bytes(
+        frame = bytes([0x03, 0x00]) + bytes.fromhex("D0E1F2A3B4C5") + bytes(
             [0, 0, 11, 0, 0, 11, 1, 1, 3, 0])
         d = decode_firmware(frame)
         self.assertEqual(d["radioFw"], "0.0.11")

@@ -52,7 +52,7 @@ class BusAttrappe(Geraetebus):
         return seriennummer.upper() in self.verbundene
 
 
-SN = "1C9DC2430444"
+SN = "D0E1F2A3B4C5"
 SN2 = "AABBCCDDEEFF"
 
 

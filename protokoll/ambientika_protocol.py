@@ -206,7 +206,7 @@ NO_CALIBRATION = Calibration()
 def parse_calibration(raw) -> dict:
     """Build {SERIAL: Calibration} from a JSON object.
 
-    Accepts ``{"1C9DC2430444": {"temp": -3.2, "rh": 6}}``. Unknown keys and
+    Accepts ``{"D0E1F2A3B4C5": {"temp": -3.2, "rh": 6}}``. Unknown keys and
     unparseable values are ignored rather than raising, so a typo in the
     environment cannot stop the bridge from starting.
     """

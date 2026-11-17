@@ -18,10 +18,10 @@ from wetterkanal import (
     Wetterkanal, kanal_aus_konfiguration, kodierer_aus_mitschnitt,
 )
 
-SN = "1C9DC2430444"
+SN = "D0E1F2A3B4C5"
 #: Ein erfundenes, aber formal glaubwürdiges Antwortpaket — so, wie eines aus
 #: einem Mitschnitt aussehen könnte.
-VORLAGE = bytes.fromhex("05001c9dc24304440a2d0000")
+VORLAGE = bytes.fromhex("0500d0e1f2a3b4c50a2d0000")
 
 
 class TestOhneBestaetigtesFormat(unittest.TestCase):

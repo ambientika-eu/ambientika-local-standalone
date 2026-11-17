@@ -20,13 +20,13 @@ from ambientika_protocol import (
     decode_firmware, decode_status,
 )
 
-SAMPLE_LEGACY = bytes.fromhex("01001c9dc2430444030101" + "1b" + "35" +
+SAMPLE_LEGACY = bytes.fromhex("0100d0e1f2a3b4c5030101" + "1b" + "35" +
                               "00" + "00" + "00" + "01" + "00" + "03")
 SAMPLE_MODERN = SAMPLE_LEGACY + bytes([0x01, 0xC6])
 
-FW_LEGACY = (bytes([0x03, 0x00]) + bytes.fromhex("1C9DC2430444")
+FW_LEGACY = (bytes([0x03, 0x00]) + bytes.fromhex("D0E1F2A3B4C5")
              + bytes([0, 0, 11, 0, 0, 11, 1, 1, 3, 0]))
-FW_MODERN = (bytes([0x03, 0x00]) + bytes.fromhex("1C9DC2430444")
+FW_MODERN = (bytes([0x03, 0x00]) + bytes.fromhex("D0E1F2A3B4C5")
              + bytes([0, 0, 28, 0, 1, 22, 1, 1, 3, 0]))
 
 
@@ -50,7 +50,7 @@ class TestLegacyStream(unittest.TestCase):
             for kind, frame in frames:
                 self.assertEqual(kind, "status")
                 self.assertEqual(len(frame), STATUS_LEN_LEGACY)
-                self.assertEqual(decode_status(frame)["serial"], "1C9DC2430444")
+                self.assertEqual(decode_status(frame)["serial"], "D0E1F2A3B4C5")
             self.assertEqual(reader.resync_count, 0, f"chunk size {chunk}")
             self.assertEqual(len(reader.buf), 0, f"chunk size {chunk}")
 
@@ -187,14 +187,14 @@ class TestRegressionAgainstTheOldBehaviour(unittest.TestCase):
         phantom = {decode_firmware(f)["serial"]
                    for kind, f in old if kind == "firmware"}
         self.assertEqual(phantom, {"011B35000000"})
-        self.assertNotIn("1C9DC2430444", phantom)
+        self.assertNotIn("D0E1F2A3B4C5", phantom)
 
     def test_new_logic_keeps_the_same_stream_in_sync(self):
         reader = FrameReader(radio_fw="0.0.11")
         frames = drive(reader, SAMPLE_LEGACY * 5, 7)
         serials = {decode_status(f)["serial"] for _, f in frames}
         self.assertEqual(len(frames), 5)
-        self.assertEqual(serials, {"1C9DC2430444"})
+        self.assertEqual(serials, {"D0E1F2A3B4C5"})
 
     def test_new_logic_emits_no_phantom_firmware_frames(self):
         reader = FrameReader(radio_fw="0.0.11")

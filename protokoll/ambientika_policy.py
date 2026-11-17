@@ -53,7 +53,7 @@ class SetupTarget:
 def parse_setup_devices(raw) -> dict:
     """Build {SERIAL: SetupTarget} from a JSON object.
 
-    Accepts ``{"1C9DC2430444": {"role": 0, "zone": 2, "house": 1}}``. Entries
+    Accepts ``{"D0E1F2A3B4C5": {"role": 0, "zone": 2, "house": 1}}``. Entries
     that cannot be parsed are skipped rather than raising, so one bad entry
     cannot prevent the bridge from starting — but it also means a typo silently
     leaves that unit unconfigured, which is the safe direction here.

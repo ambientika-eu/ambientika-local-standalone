@@ -203,7 +203,7 @@ def kanal_aus_konfiguration(wetterdienst: Wetterdienst,
 
         wetterkanal:
           anfragetyp: 0x05
-          vorlage: "05001c9dc24304440a2d0000"
+          vorlage: "0500d0e1f2a3b4c50a2d0000"
           offset_temperatur: 8
           offset_feuchte: 9
     """

@@ -27,7 +27,7 @@ from ambientika_protocol import (
 )
 from ambientika_policy import write_refusal
 
-SAMPLE_LEGACY = bytes.fromhex("01001c9dc2430444030101" + "1b" + "35" +
+SAMPLE_LEGACY = bytes.fromhex("0100d0e1f2a3b4c5030101" + "1b" + "35" +
                               "00" + "00" + "00" + "01" + "00" + "03")
 SAMPLE_MODERN = SAMPLE_LEGACY + bytes([0x01, 0xC6])
 

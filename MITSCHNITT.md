@@ -38,8 +38,8 @@ zurückschicken.
 
 ```
 >> 14:22:03  Gerät 192.168.1.44:51233 verbunden, öffne Weg zu 195.39.253.2:11000
-    14:22:03  → Status          19 B  01001c9dc24304440301011b35...
-  ★ 14:51:18  SERVER -> GERÄT  Typ 0x05  12 Byte  05001c9dc24304440a2d0000
+    14:22:03  → Status          19 B  0100d0e1f2a3b4c50301011b35...
+  ★ 14:51:18  SERVER -> GERÄT  Typ 0x05  12 Byte  0500d0e1f2a3b4c50a2d0000
 ```
 
 Die Zeilen mit **★** sind das Gesuchte: Pakete vom Server, die kein

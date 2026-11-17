@@ -30,11 +30,11 @@ from speicher import Speicher                        # noqa: E402
 from wetter import FesteWerte, Wetterdienst          # noqa: E402
 from wetterkanal import Wetterkanal, kodierer_aus_mitschnitt  # noqa: E402
 
-SN = "1C9DC2430444"
+SN = "D0E1F2A3B4C5"
 
 #: Echter 19-Byte-Statusrahmen aus Issue #5: Nachtmodus, Stufe mittel,
 #: 27 °C, 53 % rF, Rolle Master.
-STATUS_19 = bytes.fromhex("01001c9dc24304440301011b350000000100" + "03")
+STATUS_19 = bytes.fromhex("0100d0e1f2a3b4c50301011b350000000100" + "03")
 FIRMWARE = (bytes([0x03, 0x00]) + bytes.fromhex(SN)
             + bytes([0, 0, 11, 0, 0, 11, 1, 1, 3, 0]))
 #: Ein Rahmen mit unbekanntem Typ — so könnte die Wetteranfrage aussehen.
